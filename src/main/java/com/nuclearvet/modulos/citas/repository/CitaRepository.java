@@ -49,6 +49,11 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             @Param("fecha") LocalDateTime fecha
     );
 
+    // Buscar todas las citas del día (todos los veterinarios)
+    @Query("SELECT c FROM Cita c WHERE DATE(c.fechaHora) = CURRENT_DATE " +
+           "AND c.activo = true ORDER BY c.fechaHora")
+    List<Cita> buscarTodasCitasDelDia();
+
     // Contar citas pendientes
     Long countByVeterinarioIdAndEstadoAndActivoTrue(Long veterinarioId, String estado);
 }
