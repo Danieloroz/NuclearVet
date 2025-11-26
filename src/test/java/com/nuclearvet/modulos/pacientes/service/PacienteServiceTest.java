@@ -59,10 +59,11 @@ class PacienteServiceTest {
         // Setup propietario
         propietario = Usuario.builder()
                 .id(1L)
-                .nombreCompleto("Juan Pérez")
+                .nombre("Juan")
+                .apellido("Pérez")
                 .email("juan@example.com")
-                .activo(true)
                 .build();
+        propietario.setActivo(true);
 
         // Setup DTO
         crearPacienteDTO = CrearPacienteDTO.builder()
@@ -74,11 +75,9 @@ class PacienteServiceTest {
                 .fechaNacimiento(LocalDate.of(2020, 5, 15))
                 .microchip("123456789")
                 .propietarioId(1L)
-                .alergias("Ninguna")
-                .enfermedadesCronicas("Ninguna")
                 .build();
 
-        // Setup entidad
+        // Setup paciente
         paciente = Paciente.builder()
                 .id(1L)
                 .nombre("Firulais")
@@ -89,8 +88,8 @@ class PacienteServiceTest {
                 .fechaNacimiento(LocalDate.of(2020, 5, 15))
                 .microchip("123456789")
                 .propietario(propietario)
-                .activo(true)
                 .build();
+        paciente.setActivo(true);
 
         // Setup DTO respuesta
         pacienteDTO = PacienteDTO.builder()
@@ -100,7 +99,7 @@ class PacienteServiceTest {
                 .raza("Labrador")
                 .sexo("Macho")
                 .propietarioId(1L)
-                .propietarioNombre("Juan Pérez")
+                .nombrePropietario("Juan Pérez")
                 .edadEnAnios(3)
                 .build();
 
@@ -109,8 +108,8 @@ class PacienteServiceTest {
                 .id(1L)
                 .paciente(paciente)
                 .numeroHistoria("HC-2024-00001")
-                .activo(true)
                 .build();
+        historiaClinica.setActivo(true);
     }
 
     @Test

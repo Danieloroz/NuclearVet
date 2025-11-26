@@ -25,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -74,11 +75,12 @@ class ConsultaServiceTest {
         // Setup veterinario
         veterinario = Usuario.builder()
                 .id(1L)
-                .nombreCompleto("Dr. Carlos Pérez")
+                .nombre("Carlos")
+                .apellido("Pérez")
                 .email("carlos@nuclearvet.com")
                 .roles(new HashSet<>(Arrays.asList(rolVeterinario)))
-                .activo(true)
                 .build();
+        veterinario.setActivo(true);
 
         // Setup paciente
         paciente = Paciente.builder()
@@ -110,9 +112,9 @@ class ConsultaServiceTest {
                 .veterinarioId(1L)
                 .motivoConsulta("Vacunación anual")
                 .tipoServicio("CONSULTA")
-                .diagnostico("Paciente saludable")
+                .diagnosticoPrincipal("Paciente saludable")
                 .tratamiento("Vacuna antirrábica")
-                .observaciones("Próximo control en 1 año")
+                .recomendaciones("Próximo control en 1 año")
                 .signosVitales(signosDTO)
                 .build();
 
@@ -124,20 +126,20 @@ class ConsultaServiceTest {
                 .fechaConsulta(LocalDateTime.now())
                 .motivoConsulta("Vacunación anual")
                 .tipoServicio("CONSULTA")
-                .diagnostico("Paciente saludable")
+                .diagnosticoPrincipal("Paciente saludable")
                 .tratamiento("Vacuna antirrábica")
-                .activo(true)
                 .build();
+        consulta.setActivo(true);
 
         // Setup consulta DTO
         consultaDTO = ConsultaDTO.builder()
                 .id(1L)
                 .historiaClinicaId(1L)
-                .pacienteNombre("Firulais")
+                .nombrePaciente("Firulais")
                 .veterinarioId(1L)
-                .veterinarioNombre("Dr. Carlos Pérez")
+                .nombreVeterinario("Dr. Carlos Pérez")
                 .motivoConsulta("Vacunación anual")
-                .diagnostico("Paciente saludable")
+                .diagnosticoPrincipal("Paciente saludable")
                 .build();
 
         // Setup signos vitales
@@ -201,9 +203,11 @@ class ConsultaServiceTest {
         Rol rolCliente = Rol.builder().nombre("ROLE_CLIENTE").build();
         Usuario cliente = Usuario.builder()
                 .id(2L)
-                .nombreCompleto("Juan Cliente")
+                .nombre("Juan")
+                .apellido("Cliente")
                 .roles(new HashSet<>(Arrays.asList(rolCliente)))
                 .build();
+        cliente.setActivo(true);
 
         when(historiaClinicaRepository.findById(1L)).thenReturn(Optional.of(historiaClinica));
         when(usuarioRepository.findById(2L)).thenReturn(Optional.of(cliente));
@@ -277,7 +281,7 @@ class ConsultaServiceTest {
     void testListarPorVeterinarioExitoso() {
         // Given
         List<Consulta> consultas = Arrays.asList(consulta);
-        when(consultaRepository.findByVeterinarioId(1L)).thenReturn(consultas);
+        when(consultaRepository.findByVeterinarioIdOrderByFechaConsultaDesc(1L)).thenReturn(consultas);
         when(consultaMapper.toDTO(any(Consulta.class))).thenReturn(consultaDTO);
 
         // When
@@ -285,7 +289,7 @@ class ConsultaServiceTest {
 
         // Then
         assertThat(resultado).hasSize(1);
-        verify(consultaRepository).findByVeterinarioId(1L);
+        verify(consultaRepository).findByVeterinarioIdOrderByFechaConsultaDesc(1L);
     }
 
     @Test
@@ -339,7 +343,7 @@ class ConsultaServiceTest {
     void testActualizarConsultaExitoso() {
         // Given
         when(consultaRepository.findById(1L)).thenReturn(Optional.of(consulta));
-        when(signoVitalRepository.findByConsultaId(1L)).thenReturn(Optional.of(signoVital));
+        when(signoVitalRepository.findByConsultaIdOrderByFechaRegistroDesc(1L)).thenReturn(Arrays.asList(signoVital));
         when(consultaRepository.save(any(Consulta.class))).thenReturn(consulta);
         when(consultaMapper.toDTO(consulta)).thenReturn(consultaDTO);
 
@@ -368,7 +372,7 @@ class ConsultaServiceTest {
     void testActualizarConsultaCrearSignosVitales() {
         // Given
         when(consultaRepository.findById(1L)).thenReturn(Optional.of(consulta));
-        when(signoVitalRepository.findByConsultaId(1L)).thenReturn(Optional.empty());
+        when(signoVitalRepository.findByConsultaIdOrderByFechaRegistroDesc(1L)).thenReturn(Collections.emptyList());
         when(consultaRepository.save(any(Consulta.class))).thenReturn(consulta);
         when(consultaMapper.toDTO(consulta)).thenReturn(consultaDTO);
 
