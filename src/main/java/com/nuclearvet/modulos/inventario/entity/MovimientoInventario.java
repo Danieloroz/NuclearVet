@@ -30,8 +30,9 @@ public class MovimientoInventario extends EntidadBase {
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_movimiento", nullable = false, length = 20)
-    private String tipoMovimiento; // ENTRADA, SALIDA, AJUSTE, DEVOLUCION
+    private TipoMovimiento tipoMovimiento; // ENTRADA, SALIDA, AJUSTE, DEVOLUCION
 
     @Column(nullable = false)
     private Integer cantidad;

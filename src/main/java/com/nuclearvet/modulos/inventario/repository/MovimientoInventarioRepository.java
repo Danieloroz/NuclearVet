@@ -1,6 +1,7 @@
 package com.nuclearvet.modulos.inventario.repository;
 
 import com.nuclearvet.modulos.inventario.entity.MovimientoInventario;
+import com.nuclearvet.modulos.inventario.entity.TipoMovimiento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,13 +21,12 @@ public interface MovimientoInventarioRepository extends JpaRepository<Movimiento
     List<MovimientoInventario> findByProductoIdOrderByFechaMovimientoDesc(Long productoId);
     
     // Movimientos por tipo
-    List<MovimientoInventario> findByTipoMovimientoOrderByFechaMovimientoDesc(String tipoMovimiento);
+    List<MovimientoInventario> findByTipoMovimientoOrderByFechaMovimientoDesc(TipoMovimiento tipoMovimiento);
     
     // Movimientos en un rango de fechas
-    @Query("SELECT m FROM MovimientoInventario m WHERE m.fechaMovimiento BETWEEN :fechaInicio AND :fechaFin ORDER BY m.fechaMovimiento DESC")
-    List<MovimientoInventario> findByFechaMovimientoBetween(
-            @Param("fechaInicio") LocalDateTime fechaInicio,
-            @Param("fechaFin") LocalDateTime fechaFin
+    List<MovimientoInventario> findByFechaMovimientoBetweenOrderByFechaMovimientoDesc(
+            LocalDateTime fechaInicio,
+            LocalDateTime fechaFin
     );
     
     // Movimientos por usuario
@@ -37,4 +37,7 @@ public interface MovimientoInventarioRepository extends JpaRepository<Movimiento
     
     // Movimientos por proveedor
     List<MovimientoInventario> findByProveedorIdOrderByFechaMovimientoDesc(Long proveedorId);
+    
+    // Contar movimientos por producto
+    Long countByProductoId(Long productoId);
 }
