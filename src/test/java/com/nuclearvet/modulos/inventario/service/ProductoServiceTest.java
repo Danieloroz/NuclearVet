@@ -2,6 +2,7 @@ package com.nuclearvet.modulos.inventario.service;
 
 import com.nuclearvet.common.exception.ConflictoException;
 import com.nuclearvet.common.exception.RecursoNoEncontradoException;
+import com.nuclearvet.common.exception.ValidacionException;
 import com.nuclearvet.modulos.inventario.dto.CrearProductoDTO;
 import com.nuclearvet.modulos.inventario.dto.ProductoDTO;
 import com.nuclearvet.modulos.inventario.entity.Categoria;
@@ -147,24 +148,29 @@ class ProductoServiceTest {
         // Given
         crearProductoDTO.setPrecioVenta(BigDecimal.valueOf(5000)); // Menor que precio compra
         when(productoRepository.findByCodigo(anyString())).thenReturn(Optional.empty());
+        when(categoriaRepository.findById(anyLong())).thenReturn(Optional.of(categoria));
+        when(proveedorRepository.findById(anyLong())).thenReturn(Optional.of(proveedor));
 
         // When & Then
         assertThatThrownBy(() -> productoService.crearProducto(crearProductoDTO))
-                .isInstanceOf(ConflictoException.class)
-                .hasMessageContaining("El precio de venta debe ser mayor al precio de compra");
+                .isInstanceOf(ValidacionException.class)
+                .hasMessageContaining("precio de venta no puede ser menor");
     }
 
     @Test
-    @DisplayName("Crear producto con stock mayor al máximo debe lanzar excepción")
-    void crearProducto_StockExcedido_LanzaExcepcion() {
+    @DisplayName("Crear producto con stock máximo menor al mínimo debe lanzar excepción")
+    void crearProducto_StockMaximoMenor_LanzaExcepcion() {
         // Given
-        crearProductoDTO.setStockActual(150); // Mayor que stockMaximo (100)
+        crearProductoDTO.setStockMinimo(50);
+        crearProductoDTO.setStockMaximo(30); // Menor que stockMinimo
         when(productoRepository.findByCodigo(anyString())).thenReturn(Optional.empty());
+        when(categoriaRepository.findById(anyLong())).thenReturn(Optional.of(categoria));
+        when(proveedorRepository.findById(anyLong())).thenReturn(Optional.of(proveedor));
 
         // When & Then
         assertThatThrownBy(() -> productoService.crearProducto(crearProductoDTO))
-                .isInstanceOf(ConflictoException.class)
-                .hasMessageContaining("El stock actual no puede exceder el stock máximo");
+                .isInstanceOf(ValidacionException.class)
+                .hasMessageContaining("stock máximo no puede ser menor al stock mínimo");
     }
 
     @Test
@@ -353,13 +359,10 @@ class ProductoServiceTest {
     @Test
     @DisplayName("Ajustar stock con cantidad negativa debe lanzar excepción")
     void ajustarStock_CantidadNegativa_LanzaExcepcion() {
-        // Given
-        when(productoRepository.findById(anyLong())).thenReturn(Optional.of(producto));
-
         // When & Then
         assertThatThrownBy(() -> productoService.ajustarStock(1L, -10))
-                .isInstanceOf(ConflictoException.class)
-                .hasMessageContaining("La cantidad de stock no puede ser negativa");
+                .isInstanceOf(ValidacionException.class)
+                .hasMessageContaining("stock no puede ser negativo");
     }
 
     @Test

@@ -163,7 +163,6 @@ class PacienteServiceTest {
     void testActualizarPacienteExitoso() {
         // Given
         when(pacienteRepository.findById(1L)).thenReturn(Optional.of(paciente));
-        when(pacienteRepository.findByMicrochip("123456789")).thenReturn(Optional.of(paciente)); // Mismo microchip
         when(historiaClinicaRepository.findByPacienteId(1L)).thenReturn(Optional.of(historiaClinica));
         when(pacienteRepository.save(any(Paciente.class))).thenReturn(paciente);
         when(pacienteMapper.toDTO(paciente)).thenReturn(pacienteDTO);

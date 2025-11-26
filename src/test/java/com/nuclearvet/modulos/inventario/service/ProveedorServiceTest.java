@@ -257,9 +257,6 @@ class ProveedorServiceTest {
     @Test
     @DisplayName("Actualizar calificación inválida debe lanzar excepción")
     void actualizarCalificacion_Invalida_LanzaExcepcion() {
-        // Given
-        when(proveedorRepository.findById(anyLong())).thenReturn(Optional.of(proveedor));
-
         // When & Then - Calificación muy alta
         assertThatThrownBy(() -> proveedorService.actualizarCalificacion(1L, 6))
                 .isInstanceOf(ConflictoException.class)
