@@ -28,6 +28,7 @@ public class Categoria extends EntidadBase {
     @Column(length = 500)
     private String descripcion;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_categoria", length = 50)
-    private String tipoCategoria; // MEDICAMENTO, ALIMENTO, ACCESORIO, EQUIPAMIENTO, SERVICIO
+    private TipoCategoria tipoCategoria; // MEDICAMENTO, ALIMENTO, ACCESORIO, EQUIPAMIENTO, SERVICIO
 }

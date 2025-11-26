@@ -5,6 +5,7 @@ import com.nuclearvet.common.exception.RecursoNoEncontradoException;
 import com.nuclearvet.modulos.inventario.dto.CategoriaDTO;
 import com.nuclearvet.modulos.inventario.dto.CrearCategoriaDTO;
 import com.nuclearvet.modulos.inventario.entity.Categoria;
+import com.nuclearvet.modulos.inventario.entity.TipoCategoria;
 import com.nuclearvet.modulos.inventario.mapper.CategoriaMapper;
 import com.nuclearvet.modulos.inventario.repository.CategoriaRepository;
 import com.nuclearvet.modulos.inventario.repository.ProductoRepository;
@@ -99,7 +100,7 @@ public class CategoriaService {
      * Listar categorías por tipo
      */
     @Transactional(readOnly = true)
-    public List<CategoriaDTO> listarPorTipo(String tipoCategoria) {
+    public List<CategoriaDTO> listarPorTipo(TipoCategoria tipoCategoria) {
         log.info("Listando categorías del tipo: {}", tipoCategoria);
         List<Categoria> categorias = categoriaRepository.findByTipoCategoriaAndActivoTrue(tipoCategoria);
         return categorias.stream()
