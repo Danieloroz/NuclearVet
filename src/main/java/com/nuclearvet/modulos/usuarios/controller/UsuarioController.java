@@ -45,7 +45,7 @@ public class UsuarioController {
         UsuarioDTO usuario = usuarioService.crearUsuario(dto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(RespuestaExitosa.exito("Usuario creado exitosamente, parce", usuario));
+                .body(RespuestaExitosa.crear(usuario, "Usuario creado exitosamente, parce"));
     }
     
     /**
@@ -57,7 +57,7 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RespuestaExitosa<List<UsuarioDTO>>> obtenerTodos() {
         List<UsuarioDTO> usuarios = usuarioService.obtenerTodos();
-        return ResponseEntity.ok(RespuestaExitosa.exito(usuarios));
+        return ResponseEntity.ok(RespuestaExitosa.crear(usuarios));
     }
     
     /**
@@ -69,7 +69,7 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RespuestaExitosa<UsuarioDTO>> obtenerPorId(@PathVariable Long id) {
         UsuarioDTO usuario = usuarioService.obtenerPorId(id);
-        return ResponseEntity.ok(RespuestaExitosa.exito(usuario));
+        return ResponseEntity.ok(RespuestaExitosa.crear(usuario));
     }
     
     /**
@@ -84,7 +84,7 @@ public class UsuarioController {
             @Valid @RequestBody ActualizarUsuarioDTO dto) {
         
         UsuarioDTO usuario = usuarioService.actualizarUsuario(id, dto);
-        return ResponseEntity.ok(RespuestaExitosa.exito("Usuario actualizado, llave", usuario));
+        return ResponseEntity.ok(RespuestaExitosa.crear(usuario, "Usuario actualizado, llave"));
     }
     
     /**
@@ -96,7 +96,7 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RespuestaExitosa<Void>> desactivarUsuario(@PathVariable Long id) {
         usuarioService.desactivarUsuario(id);
-        return ResponseEntity.ok(RespuestaExitosa.exito("Usuario desactivado correctamente", null));
+        return ResponseEntity.ok(RespuestaExitosa.crear(null, "Usuario desactivado correctamente"));
     }
     
     /**
@@ -110,6 +110,6 @@ public class UsuarioController {
             @PathVariable String nombreRol) {
         
         List<UsuarioDTO> usuarios = usuarioService.obtenerPorRol(nombreRol);
-        return ResponseEntity.ok(RespuestaExitosa.exito(usuarios));
+        return ResponseEntity.ok(RespuestaExitosa.crear(usuarios));
     }
 }

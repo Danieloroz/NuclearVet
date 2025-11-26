@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,19 +59,17 @@ public class PacienteService {
                 .fechaNacimiento(dto.getFechaNacimiento())
                 .microchip(dto.getMicrochip())
                 .propietario(propietario)
-                .activo(true)
                 .build();
 
         paciente = pacienteRepository.save(paciente);
 
         // Crear historia clínica automáticamente (RF2.1)
+        String numeroHistoria = HistoriaClinica.generarNumeroHistoria(paciente.getId());
         HistoriaClinica historia = HistoriaClinica.builder()
                 .paciente(paciente)
-                .alergias(dto.getAlergias())
-                .enfermedadesCronicas(dto.getEnfermedadesCronicas())
-                .cirugiasPrevias(dto.getCirugiasPrevias())
-                .observaciones(dto.getObservaciones())
-                .activo(true)
+                .numeroHistoria(numeroHistoria)
+                .fechaApertura(LocalDateTime.now())
+                .observacionesGenerales(dto.getObservaciones())
                 .build();
 
         historiaClinicaRepository.save(historia);
@@ -107,10 +106,7 @@ public class PacienteService {
 
         // Actualizar historia clínica si existe
         historiaClinicaRepository.findByPacienteId(id).ifPresent(historia -> {
-            historia.setAlergias(dto.getAlergias());
-            historia.setEnfermedadesCronicas(dto.getEnfermedadesCronicas());
-            historia.setCirugiasPrevias(dto.getCirugiasPrevias());
-            historia.setObservaciones(dto.getObservaciones());
+            historia.setObservacionesGenerales(dto.getObservaciones());
             historiaClinicaRepository.save(historia);
         });
 

@@ -77,7 +77,7 @@ public class UsuarioService {
         usuario.setRoles(roles);
         
         usuario.setActivo(true);
-        usuario.setIntentrosFallidos(0);
+        usuario.setIntentosFallidos(0);
         usuario.setBloqueado(false);
         
         Usuario usuarioGuardado = usuarioRepository.save(usuario);

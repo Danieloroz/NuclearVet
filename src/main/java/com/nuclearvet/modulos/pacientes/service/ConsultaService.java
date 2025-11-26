@@ -5,6 +5,7 @@ import com.nuclearvet.common.exception.ValidacionException;
 import com.nuclearvet.modulos.pacientes.dto.ConsultaDTO;
 import com.nuclearvet.modulos.pacientes.dto.CrearConsultaDTO;
 import com.nuclearvet.modulos.pacientes.dto.HistoriaClinicaDTO;
+import com.nuclearvet.modulos.pacientes.dto.PacienteDTO;
 import com.nuclearvet.modulos.pacientes.entity.Consulta;
 import com.nuclearvet.modulos.pacientes.entity.HistoriaClinica;
 import com.nuclearvet.modulos.pacientes.entity.SignoVital;
@@ -62,14 +63,17 @@ public class ConsultaService {
         Consulta consulta = Consulta.builder()
                 .historiaClinica(historia)
                 .veterinario(veterinario)
-                .fechaConsulta(LocalDateTime.now())
+                .fechaConsulta(dto.getFechaConsulta() != null ? dto.getFechaConsulta() : LocalDateTime.now())
                 .motivoConsulta(dto.getMotivoConsulta())
                 .tipoServicio(dto.getTipoServicio())
-                .diagnostico(dto.getDiagnostico())
+                .anamnesis(dto.getAnamnesis())
+                .examenFisico(dto.getExamenFisico())
+                .diagnosticoPrincipal(dto.getDiagnosticoPrincipal())
+                .diagnosticosSecundarios(dto.getDiagnosticosSecundarios())
                 .tratamiento(dto.getTratamiento())
-                .observaciones(dto.getObservaciones())
-                .proximaRevision(dto.getProximaRevision())
-                .activo(true)
+                .recomendaciones(dto.getRecomendaciones())
+                .proximaCita(dto.getProximaCita())
+                .costoConsulta(dto.getCostoConsulta())
                 .build();
 
         consulta = consultaRepository.save(consulta);
@@ -78,13 +82,13 @@ public class ConsultaService {
         if (dto.getSignosVitales() != null) {
             SignoVital signos = SignoVital.builder()
                     .consulta(consulta)
+                    .fechaRegistro(LocalDateTime.now())
                     .temperatura(dto.getSignosVitales().getTemperatura())
                     .peso(dto.getSignosVitales().getPeso())
                     .frecuenciaCardiaca(dto.getSignosVitales().getFrecuenciaCardiaca())
                     .frecuenciaRespiratoria(dto.getSignosVitales().getFrecuenciaRespiratoria())
                     .presionArterial(dto.getSignosVitales().getPresionArterial())
                     .observaciones(dto.getSignosVitales().getObservaciones())
-                    .activo(true)
                     .build();
 
             signoVitalRepository.save(signos);
@@ -121,16 +125,23 @@ public class ConsultaService {
                 .map(consultaMapper::toDTO)
                 .collect(Collectors.toList());
 
+        // Convertir paciente a DTO
+        PacienteDTO pacienteDTO = PacienteDTO.builder()
+                .id(historia.getPaciente().getId())
+                .nombre(historia.getPaciente().getNombre())
+                .especie(historia.getPaciente().getEspecie())
+                .raza(historia.getPaciente().getRaza())
+                .sexo(historia.getPaciente().getSexo())
+                .build();
+
         return HistoriaClinicaDTO.builder()
                 .id(historia.getId())
                 .numeroHistoria(historia.getNumeroHistoria())
-                .pacienteId(historia.getPaciente().getId())
-                .pacienteNombre(historia.getPaciente().getNombre())
-                .alergias(historia.getAlergias())
-                .enfermedadesCronicas(historia.getEnfermedadesCronicas())
-                .cirugiasPrevias(historia.getCirugiasPrevias())
-                .observaciones(historia.getObservaciones())
+                .fechaApertura(historia.getFechaApertura())
+                .observacionesGenerales(historia.getObservacionesGenerales())
+                .paciente(pacienteDTO)
                 .consultas(consultasDTO)
+                .totalConsultas((long) consultasDTO.size())
                 .build();
     }
 
@@ -141,7 +152,7 @@ public class ConsultaService {
     public List<ConsultaDTO> listarPorVeterinario(Long veterinarioId) {
         log.info("Listando consultas del veterinario: {}", veterinarioId);
 
-        List<Consulta> consultas = consultaRepository.findByVeterinarioId(veterinarioId);
+        List<Consulta> consultas = consultaRepository.findByVeterinarioIdOrderByFechaConsultaDesc(veterinarioId);
         return consultas.stream()
                 .map(consultaMapper::toDTO)
                 .collect(Collectors.toList());
@@ -187,38 +198,42 @@ public class ConsultaService {
 
         consulta.setMotivoConsulta(dto.getMotivoConsulta());
         consulta.setTipoServicio(dto.getTipoServicio());
-        consulta.setDiagnostico(dto.getDiagnostico());
+        consulta.setAnamnesis(dto.getAnamnesis());
+        consulta.setExamenFisico(dto.getExamenFisico());
+        consulta.setDiagnosticoPrincipal(dto.getDiagnosticoPrincipal());
+        consulta.setDiagnosticosSecundarios(dto.getDiagnosticosSecundarios());
         consulta.setTratamiento(dto.getTratamiento());
-        consulta.setObservaciones(dto.getObservaciones());
-        consulta.setProximaRevision(dto.getProximaRevision());
+        consulta.setRecomendaciones(dto.getRecomendaciones());
+        consulta.setProximaCita(dto.getProximaCita());
+        consulta.setCostoConsulta(dto.getCostoConsulta());
 
         // Actualizar signos vitales si existen
         if (dto.getSignosVitales() != null) {
-            signoVitalRepository.findByConsultaId(id).ifPresentOrElse(
-                signos -> {
-                    signos.setTemperatura(dto.getSignosVitales().getTemperatura());
-                    signos.setPeso(dto.getSignosVitales().getPeso());
-                    signos.setFrecuenciaCardiaca(dto.getSignosVitales().getFrecuenciaCardiaca());
-                    signos.setFrecuenciaRespiratoria(dto.getSignosVitales().getFrecuenciaRespiratoria());
-                    signos.setPresionArterial(dto.getSignosVitales().getPresionArterial());
-                    signos.setObservaciones(dto.getSignosVitales().getObservaciones());
-                    signoVitalRepository.save(signos);
-                },
-                () -> {
-                    // Si no existían, crearlos
-                    SignoVital nuevosSignos = SignoVital.builder()
-                            .consulta(consulta)
-                            .temperatura(dto.getSignosVitales().getTemperatura())
-                            .peso(dto.getSignosVitales().getPeso())
-                            .frecuenciaCardiaca(dto.getSignosVitales().getFrecuenciaCardiaca())
-                            .frecuenciaRespiratoria(dto.getSignosVitales().getFrecuenciaRespiratoria())
-                            .presionArterial(dto.getSignosVitales().getPresionArterial())
-                            .observaciones(dto.getSignosVitales().getObservaciones())
-                            .activo(true)
-                            .build();
-                    signoVitalRepository.save(nuevosSignos);
-                }
-            );
+            List<SignoVital> signosExistentes = signoVitalRepository.findByConsultaIdOrderByFechaRegistroDesc(id);
+            
+            if (!signosExistentes.isEmpty()) {
+                SignoVital signos = signosExistentes.get(0);
+                signos.setTemperatura(dto.getSignosVitales().getTemperatura());
+                signos.setPeso(dto.getSignosVitales().getPeso());
+                signos.setFrecuenciaCardiaca(dto.getSignosVitales().getFrecuenciaCardiaca());
+                signos.setFrecuenciaRespiratoria(dto.getSignosVitales().getFrecuenciaRespiratoria());
+                signos.setPresionArterial(dto.getSignosVitales().getPresionArterial());
+                signos.setObservaciones(dto.getSignosVitales().getObservaciones());
+                signoVitalRepository.save(signos);
+            } else {
+                // Si no existían, crearlos
+                SignoVital nuevosSignos = SignoVital.builder()
+                        .consulta(consulta)
+                        .fechaRegistro(LocalDateTime.now())
+                        .temperatura(dto.getSignosVitales().getTemperatura())
+                        .peso(dto.getSignosVitales().getPeso())
+                        .frecuenciaCardiaca(dto.getSignosVitales().getFrecuenciaCardiaca())
+                        .frecuenciaRespiratoria(dto.getSignosVitales().getFrecuenciaRespiratoria())
+                        .presionArterial(dto.getSignosVitales().getPresionArterial())
+                        .observaciones(dto.getSignosVitales().getObservaciones())
+                        .build();
+                signoVitalRepository.save(nuevosSignos);
+            }
         }
 
         consulta = consultaRepository.save(consulta);

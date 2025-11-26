@@ -40,7 +40,7 @@ public class AuthController {
             @Valid @RequestBody LoginDTO loginDTO) {
         
         AuthResponseDTO response = usuarioService.login(loginDTO);
-        return ResponseEntity.ok(RespuestaExitosa.crear("Bienvenido, parce!", response));
+        return ResponseEntity.ok(RespuestaExitosa.crear(response, "Bienvenido, parce!"));
     }
     
     /**
@@ -55,9 +55,8 @@ public class AuthController {
             @Valid @RequestBody RecuperarContrasenaDTO dto) {
         
         usuarioService.solicitarRecuperacionContrasena(dto);
-        return ResponseEntity.ok(RespuestaExitosa.crear(
-                "Si el email existe, te llegará un correo para recuperar la contraseña, llave", 
-                null));
+        return ResponseEntity.ok(RespuestaExitosa.crear(null,
+                "Si el email existe, te llegará un correo para recuperar la contraseña, llave"));
     }
     
     /**
@@ -72,8 +71,7 @@ public class AuthController {
             @Valid @RequestBody CambiarContrasenaDTO dto) {
         
         usuarioService.cambiarContrasenaConToken(dto);
-        return ResponseEntity.ok(RespuestaExitosa.crear(
-                "Contraseña cambiada exitosamente, parce. Ya podés iniciar sesión", 
-                null));
+        return ResponseEntity.ok(RespuestaExitosa.crear(null,
+                "Contraseña cambiada exitosamente, parce. Ya podés iniciar sesión"));
     }
 }
