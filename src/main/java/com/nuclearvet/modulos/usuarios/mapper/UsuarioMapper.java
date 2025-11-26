@@ -30,9 +30,6 @@ public interface UsuarioMapper {
     @Mapping(target = "bloqueado", ignore = true)
     @Mapping(target = "tokenRecuperacion", ignore = true)
     @Mapping(target = "tokenRecuperacionExpiracion", ignore = true)
-    @Mapping(target = "fechaCreacion", ignore = true)
-    @Mapping(target = "fechaActualizacion", ignore = true)
-    @Mapping(target = "activo", constant = "true")
     Usuario toEntity(CrearUsuarioDTO dto);
     
     @Named("rolesToStrings")

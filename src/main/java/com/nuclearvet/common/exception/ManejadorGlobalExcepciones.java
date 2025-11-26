@@ -38,10 +38,10 @@ public class ManejadorGlobalExcepciones {
         
         RespuestaError respuesta = RespuestaError.builder()
                 .timestamp(LocalDateTime.now())
-                .estado(ex.getHttpStatus().value())
+                .status(ex.getHttpStatus().value())
                 .error(ex.getHttpStatus().getReasonPhrase())
                 .mensaje(ex.getMessage())
-                .ruta(request.getDescription(false).replace("uri=", ""))
+                .path(request.getDescription(false).replace("uri=", ""))
                 .build();
         
         return new ResponseEntity<>(respuesta, ex.getHttpStatus());
@@ -67,10 +67,10 @@ public class ManejadorGlobalExcepciones {
         
         RespuestaError respuesta = RespuestaError.builder()
                 .timestamp(LocalDateTime.now())
-                .estado(HttpStatus.BAD_REQUEST.value())
+                .status(HttpStatus.BAD_REQUEST.value())
                 .error("Error de Validación")
                 .mensaje("Uy parce, hay errores en los datos que enviaste: " + mensaje)
-                .ruta(request.getDescription(false).replace("uri=", ""))
+                .path(request.getDescription(false).replace("uri=", ""))
                 .detalles(errores)
                 .build();
         
@@ -92,10 +92,10 @@ public class ManejadorGlobalExcepciones {
         
         RespuestaError respuesta = RespuestaError.builder()
                 .timestamp(LocalDateTime.now())
-                .estado(HttpStatus.BAD_REQUEST.value())
+                .status(HttpStatus.BAD_REQUEST.value())
                 .error("Violación de Restricciones")
                 .mensaje("Los datos no cumplen las restricciones, mijo")
-                .ruta(request.getDescription(false).replace("uri=", ""))
+                .path(request.getDescription(false).replace("uri=", ""))
                 .detalles(errores)
                 .build();
         
@@ -111,10 +111,10 @@ public class ManejadorGlobalExcepciones {
         
         RespuestaError respuesta = RespuestaError.builder()
                 .timestamp(LocalDateTime.now())
-                .estado(HttpStatus.UNAUTHORIZED.value())
+                .status(HttpStatus.UNAUTHORIZED.value())
                 .error("No Autorizado")
                 .mensaje("Las credenciales son incorrectas, llave. Revisa bien el usuario y la contraseña")
-                .ruta(request.getDescription(false).replace("uri=", ""))
+                .path(request.getDescription(false).replace("uri=", ""))
                 .build();
         
         return new ResponseEntity<>(respuesta, HttpStatus.UNAUTHORIZED);
@@ -129,10 +129,10 @@ public class ManejadorGlobalExcepciones {
         
         RespuestaError respuesta = RespuestaError.builder()
                 .timestamp(LocalDateTime.now())
-                .estado(HttpStatus.FORBIDDEN.value())
+                .status(HttpStatus.FORBIDDEN.value())
                 .error("Prohibido")
                 .mensaje("No tenés permisos para hacer eso, parcero")
-                .ruta(request.getDescription(false).replace("uri=", ""))
+                .path(request.getDescription(false).replace("uri=", ""))
                 .build();
         
         return new ResponseEntity<>(respuesta, HttpStatus.FORBIDDEN);
@@ -147,10 +147,10 @@ public class ManejadorGlobalExcepciones {
         
         RespuestaError respuesta = RespuestaError.builder()
                 .timestamp(LocalDateTime.now())
-                .estado(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error("Error Interno del Servidor")
                 .mensaje("Uy parce, algo salió mal. Ya estamos revisando qué pasó")
-                .ruta(request.getDescription(false).replace("uri=", ""))
+                .path(request.getDescription(false).replace("uri=", ""))
                 .build();
         
         return new ResponseEntity<>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
